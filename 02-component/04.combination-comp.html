@@ -1,0 +1,109 @@
+<html>
+<!--
+	组件组合-prop
+	1、组件实例的作用域是孤立的。这意味着不能 (也不应该)在子组件的模板内直接引用父组件的数据。父组件的数据需要通过 prop 才能下发到子组件中
+	2、注意：HTML 特性是不区分大小写的。所以，当使用的不是字符串模板时，驼峰式命名 的 prop 需要转换为相对应的 短横线分隔式命名：
+
+-->
+<head>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+	<!-- 静态Prop值传入 -->
+	<div id="app">
+		<!-- 1、给msg传入一个普通字符串 -->
+		<child-comp msg="hello world!"></child-comp>
+		<br>
+		<!-- 2、模板中camelCase (驼峰式命名) 的 prop 需要转换为相对应的 kebab-case (短横线分隔式命名) -->
+		<!-- 2.1、错误 -->
+		<camel2kebab myMsg="驼峰式属性命名错误"></camel2kebab>
+		<br>
+		<!-- 2.2、正确 -->
+		<camel2kebab my-msg="短横线属性命名正确"></camel2kebab>
+	</div>
+	<!-- 动态Prop绑定属性 -->
+	<div id="app2">
+		<!-- 1、动态绑定一个属性 -->
+		<span>1、动态绑定一个属性</span>
+		<br>
+		消息：<input type="text" v-model="parentMsg" />
+		年龄<input type="text" v-model="parentAge" />
+		<dymic-comp age="13" v-bind:msg="parentMsg"></dymic-comp>
+		<br>
+		<!-- 2、动态绑定所有属性，
+		可直接使用v-bind绑定一个对象，对象的属性和组件的属性名保持一致	
+		 -->
+		<span>2、动态绑定所有属性</span>
+		<br>
+		消息：<input type="text" v-model="parentParam.msg" />
+		年龄<input type="text" v-model="parentParam.age" />
+		<dymic-comp v-bind="parentParam"></dymic-comp>
+	</div>
+	
+	<!-- 修改 prop 中数据 -->
+	<div id="app3">
+		<!-- 需求1：Prop 作为初始值传入后，子组件把它当作局部数据来用 -->
+		<modifyProp1 prop-value="abc"></modifyProp1>
+	</div>
+
+</body>
+<script>
+	Vue.component('child-comp',{
+		//声明prop
+		props:['msg'],
+		// 就像 data 一样，prop 也可以在模板中使用
+ 		// 同样也可以在 vm 实例中通过 this.message 来使用
+		template:'<span>{{ msg }}</span>'
+	});
+
+	Vue.component('camel2kebab',{
+		props:['myMsg'],
+		template:'<span>{{ myMsg }}</span>'
+	});
+
+	Vue.component('dymic-comp',{
+		props:['msg','age'],
+		template:'<span>{{ msg }} ==> {{ age }} </span>'
+	});
+
+
+	/*修改 prop 中数据：
+	需求1、Prop 作为初始值传入后，子组件把它当作局部数据来用。
+	方案1：定义一个局部变量，并用 prop 的值初始化它。
+	*/
+	Vue.component('modifyProp1',{
+		props:['propValue'],
+		template:'<span>{{ propValue }}</span><br>',
+		data:function(){
+			return {
+				propValue: typeof(this.propValue)
+			}
+		}
+	});
+
+	/*修改 prop 中数据：
+	  2、Prop 作为原始数据传入，由子组件处理成其它数据输出：
+	*/
+
+
+	var app = new Vue({
+		el:"#app"
+	});
+	var app2 = new Vue({
+		el:"#app2",
+		data:{
+			parentMsg:'',
+			parentAge:'',
+			parentParam:{
+				msg:'',
+				age:''
+			}
+		}
+	});
+
+
+	var app3 = new Vue({
+		el:"#app3"
+	});
+</script>
+</html>

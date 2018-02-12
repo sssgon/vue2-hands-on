@@ -1,0 +1,68 @@
+<html>
+<!--
+	构造 Vue 实例时传入的各种选项大多数都可以在组件里使用。只有一个例外：data 必须是函数,否则Vue 会停止运行，并在控制台发出警告，告诉你在组件实例中 data 必须是一个函数。
+-->
+<head>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+	<div id="app">
+		<!-- 错误-->
+		<span>1、错误(报错不显示)：</span>
+		<err-count-comp></err-count-comp>
+		<err-count-comp></err-count-comp>
+		<err-count-comp></err-count-comp>
+		<br>
+		<!-- 正确 -->
+		<span>2、正确：</span>
+		<right-count-comp></right-count-comp>
+		<right-count-comp></right-count-comp>
+		<right-count-comp></right-count-comp>
+		<br>
+		<!-- 上面的正确示例中，因为使用了同一个data对象，所以点击不同的按钮会修改同一个对象，可以通过为每个组件返回全新的数据对象来优化这个问题-->
+		<span>3、优化：</span>
+		<optimization-count-comp></optimization-count-comp>
+		<optimization-count-comp></optimization-count-comp>
+		<optimization-count-comp></optimization-count-comp>
+	</div>
+
+</body>
+<script>
+	/*1、错误的全局组件声明，控制台报错
+		该组件用于数字+1
+	*/
+	Vue.component('err-count-comp',{
+		template:'<button v-on:click="counter += 1">{{ counter }}</button>',
+		data:{
+			counter:0
+		}
+	});
+
+	/*2、正确的全局组件声明，data使用函数返回
+		该组件用于数字+1
+	*/
+	var data = {counter:0};
+	Vue.component('right-count-comp',{
+		template:'<button v-on:click="counter += 1">{{ counter }}</button>',
+		data:function(){
+			return data;
+		}
+	});
+
+	/*3、优化，不同的组件实例不再操作同一个data对象，而是为每个组件返回全新的数据对象
+	*/
+	Vue.component('optimization-count-comp',{
+		template:'<button v-on:click="counter += 1">{{ counter }}{{msg}}</button>',
+		data:function(){
+			return{
+				counter:0,
+				msg:'可以返回多个变量'
+			};
+		}
+	});
+
+	var app = new Vue({
+		el:"#app"
+	});
+</script>
+</html>

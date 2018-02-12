@@ -1,0 +1,261 @@
+<html>
+<!--
+	1、用v-on指令可以添加一个事件监听器
+	2、待补充，v-on可以添加的事件监听
+	<menu-item v-bind:filter-data="filterKey" v-on:open-pic-card="openPicCard" v-on:toggle-scroll="toggleScroll" v-on:add-dish="addDish" v-on:minus-dish="minusDish"></menu-item>
+	3、Object.freeze(app2_data);可冻结属性修改
+	4、v-on:可缩写为@即
+		v-on:click="reverseMsg"等效@click="reverseMsg"
+	5、v-on调用内联处理器
+	6、事件修饰符：
+		.stop：阻止单击事件继续传播
+		.prevent：提交事件不再重载页面
+		.capture：添加事件监听器时使用事件捕获模式，即元素自身触发的事件先在此处处理，然后才交由内部元素进行处理
+		.self：只当在 event.target 是当前元素自身时触发处理函数，即事件不是从内部元素触发的
+		.once：事件只能被执行一次
+		注意：
+			1、修饰符可以串联，也可以只有修饰符；
+			2、使用修饰符时，顺序很重要；相应的代码会以同样的顺序产生。因此，用 @click.prevent.self 会阻止所有的点击，而 @click.self.prevent 只会阻止对元素自身的点击。
+		2.1.4版本新增.once秀试用，使得点击事件将只会触发一次
+		<a v-on:click.once="doOnce"></a>
+		2.3.0 新增Vue 还对应 addEventListener 中的 passive 选项提供了 .passive 修饰符。滚动事件的默认行为 (即滚动行为) 将会立即触发，而不会等待 'onScroll 完成。这其中包含 'event.preventDefault()'的情况。
+		<div v-on:scroll.passive="onScroll">passive</div>
+		这个 .passive 修饰符尤其能够提升移动端的性能。
+		注意：不要把 .passive 和 .prevent 一起使用，因为 .prevent 将会被忽略，同时浏览器可能会向你展示一个警告。请记住，.passive 会告诉浏览器你不想阻止事件的默认行为。
+	7、按键修饰符：
+	8、系统修饰键：
+		注意：修饰键与常规按键不同，在和 keyup 事件一起用时，事件触发时修饰键必须处于按下状态。换句话说，只有在按住 ctrl 的情况下释放其它按键，才能触发 keyup.ctrl。而单单释放 ctrl 也不会触发事件。
+
+	99、js:用split函数拆分成数组对象，再用reverse函数将数组倒序排列，join() 方法用于把数组中的所有元素放入一个字符串
+-->
+<head>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+	<!-- 1、基础 -->
+	<div id="app">
+		<span>1、v-on运行javascript代码：{{num}}</span>
+		<button v-on:click="num = num + 1" />numm+1</button>
+		<br>
+		<!-- 1.1、v-on接收需要调用的方法名称 -->
+		<span>{{message}}</span>
+		<br>
+		<button v-on:click="reverseMsg">逆转消息</button>
+		<button @click="reverseMsg">逆转消息（v-on缩写为@）</button>
+		<!-- 1.2、内联处理 -->
+		<br>
+		<span>1.3、内联处理器：</span>
+		<input type="text" v-model="innerHi" />
+		<!--1.3.1、内联处理器传入输入的值 -->
+		<button v-on:click="innerMtd(innerHi)" >内联处理器say innerHi</button>
+		<!--1.3.2、内联处理器传入固定的值 -->
+		<button v-on:click="innerMtd('hi')" >内联处理器say hi</button>
+		<!--1.3.3、内联处理器访问原始的 DOM 事件 -->
+		<button v-on:click="innerDomMtd('Form cannot be submitted yet.', $event)" >内联处理器sevent</button>
+	</div>
+	
+	<!-- 2、属性冻结 -->
+	<div id="app2">
+		<span>2、属性冻结，原属性值：{{msg}}</span>
+		<br>
+		<button v-on:click="addAttr">添加属性</button>
+		<br>
+		<button v-on:click="freezeAttr">冻结属性</button>
+	</div>
+	<!-- 3、修饰符 -->
+	<div id="app3">
+		<br>
+		<span>3、修饰符</span>
+		<br>
+		<!-- 阻止单击事件继续传播 -->
+		<a v-on:click.stop="doThis">阻止单击事件继续传播</a>
+		<!-- 提交事件不再重载页面 -->
+		<form v-on:submit.prevent="onSubmit">提交事件不再重载页面</form>
+		<!-- 修饰符可以串联 -->
+		<a v-on:click.stop.prevent="doThat">修饰符可以串联</a>
+		<!-- 只有修饰符 -->
+		<form v-on:submit.prevent>只有修饰符</form>
+		<!-- 添加事件监听器时使用事件捕获模式 -->
+		<!-- 即元素自身触发的事件先在此处处理，然后才交由内部元素进行处理 -->
+		<div v-on:click.capture="doThis">capture=</div>
+		<!-- 只当在 event.target 是当前元素自身时触发处理函数 -->
+		<!-- 即事件不是从内部元素触发的 -->
+		<div v-on:click.self="doThat">self</div>
+		<!-- 点击事件将只会触发一次 -->
+		<a v-on:click.once="doOnce">once</a><!-- 滚动事件的默认行为 (即滚动行为) 将会立即触发 -->
+		<!-- 而不会等待 `onScroll` 完成  -->
+		<!-- 这其中包含 `event.preventDefault()` 的情况 -->
+		<div v-on:scroll.passive="onScroll">passive</div>
+	</div>
+	
+
+	<!-- 4、按键修饰符 -->
+	<div id="app4">
+		<br>
+		<span>4、1按键修饰符</span>
+		<br>
+		<!-- 3.1.1、回车键触发 -->
+		<input type="text" v-on:keyup.enter="enterM()" v-model="msg" placeholder="回车键触发" />
+		<!-- 4.1.2、Tab键触发，使用Tab键获取标签焦点时触发 -->
+		<input type="text" v-on:keyup.tab="tabM()" v-model="msg" placeholder="增Tab键触发" />
+		<!-- 4.1.3、Esc键触发 -->
+		<input type="text" v-on:keyup.esc="escM()" v-model="msg" placeholder="Esc键触发" />
+		<!-- 4.1.4、空格键触发 -->
+		<input type="text" v-on:keyup.space="spaceM()" v-model="msg" placeholder="空格键触发" />
+		<!-- 4.1.5、向上方向键触发 -->
+		<input type="text" v-on:keyup.up="upM()" v-model="msg" placeholder="向上方向键触发 " />
+		<!-- 4.1.6、向下方向键触发 -->
+		<input type="text" v-on:keyup.down="downM()" v-model="msg" placeholder="向下方向键触发" />
+		<!-- 4.1.7、向左方向键触发 -->
+		<input type="text" v-on:keyup.left="leftM()" v-model="msg" placeholder="向左方向键触发" />
+		<!-- 4.1.8、向右方向键触发 -->
+		<input type="text" v-on:keyup.right="rightM()" v-model="msg" placeholder="向右方向键触发" />
+		<br>
+		<span>4.2系统修饰键(2.1.0版本新增)</span>
+		<br>
+		<!-- 4.2.1 ctrl键触发，需要ctrl和其他键同时按下，释放其他键时才会触发 -->
+		<input type="text" v-on:keyup.ctrl="ctrlM()" v-model="msg" placeholder="ctrl键触发" />
+		<!-- 4.2.2 alt键触发，需要alt和其他键同时按下，释放其他键时才会触发 -->
+		<input type="text" v-on:keyup.alt="altM()" v-model="msg" placeholder="alt键触发" />
+		<!-- 4.2.3 shift键触发，需要shift和其他键同时按下，释放其他键时才会触发 -->
+		<input type="text" v-on:keyup.shift="shiftM()" v-model="msg" placeholder="shift键触发" />
+		<!-- 4.2.4 meta键触发，需要meta代表的键和其他键同时按下，释放其他键时才会触发 
+			注意：在 Mac 系统键盘上，meta 对应 command 键 (⌘)。在 Windows 系统键盘 meta 对应 Windows 徽标键 (⊞)。在 Sun 操作系统键盘上，meta 对应实心宝石键 (◆)。在其他特定键盘上，尤其在 MIT 和 Lisp 机器的键盘、以及其后继产品，比如 Knight 键盘、space-cadet 键盘，meta 被标记为“META”。在 Symbolics 键盘上，meta 被标记为“META”或者“Meta”。
+		-->
+		<input type="text" v-on:keyup.meta="metaM()" v-model="msg" placeholder="meta键触发" />
+		<br>
+		<span>4.3excat修饰符(2.5.0新增)</span>
+		<br>
+		<!-- 4.3.1、有且只有 Ctrl 被按下的时候才触发 -->
+		<button @click.ctrl.exact="onCtrlClick">有且只有 Ctrl 被按下的时候才触发</button>
+		<!-- 4.3.2、没有任何系统修饰符被按下的时候才触发 -->
+		<button @click.exact="onClick">没有任何系统修饰符被按下的时候才触发</button>
+		
+	</div>
+</body>
+<script>
+	var app = new Vue({
+			el:"#app",
+			data:{
+				num:1,
+				message:"2、v-on接收需要调用的方法名称：",
+				innerHi:''
+			},
+			methods:{
+				reverseMsg: function(){
+					this.message = this.message.split("").reverse().join("");
+				},
+				innerMtd:function(mm){
+					alert("hi " + mm);
+				},
+				innerDomMtd:function(msg,event){
+					// 现在我们可以访问原生事件对象
+				    if (event){
+				    	event.preventDefault();//通知浏览器不要执行与事件关联的默认动作。
+				    } 
+				    alert(msg);
+				    
+				}
+			}
+	});
+	
+	//2、属性冻结
+	var app2_data = {msg:"这里的属性是msg"};
+	Object.freeze(app2_data);
+	var app2 = new Vue({
+			el:"#app2",
+			data:app2_data,
+			methods:{
+				addAttr:function(){
+					//这里添加新属性，但是视图中无法体现，在控制台中可以查看msg2属性的值
+					this.msg2 = "新属性叫msg2"
+				},
+				freezeAttr:function(){
+					//Object.freeze(app2_data);执行后，再执行this.msg赋值，会在控制台报错
+					this.msg = "出现该提示，表示冻结失败";
+				}
+			}
+	
+	});
+
+	//3、修饰符
+	var app3 = new Vue({
+		el:"#app3",
+		data:{
+
+		},
+		methods:{
+			doThis:function(){
+				alert("阻止单击事件继续传播v-on:click.stop");
+			},
+			onSubmit:function(){
+				alert("提交事件不再重载页面v-on:submit.prevent");
+			},
+			doThat:function(){
+				alert("修饰符可以串联v-on:click.stop.prevent");
+			},
+			doOnce:function(){
+				alert(".once修饰符，事件只能触发一次");
+			},
+			onScroll:function(){
+				alert(".passive滚动事件的默认行为 (即滚动行为) 将会立即触发");
+			}
+		}
+	});
+
+	//4、按键修饰符
+	var app4 = new Vue({
+		el:"#app4",
+		data:{
+			msg:''
+		},
+		methods:{
+			//按键修饰符
+			enterM:function(){
+				alert("enter:" + this.msg);
+			},
+			tabM:function(){
+				alert("tab:"+this.msg);
+			},
+			escM:function(){
+				alert("esc:"+this.msg);
+			},
+			spaceM:function(){
+				alert("space:"+this.msg);
+			},
+			upM:function(){
+				alert("up:"+this.msg);
+			},
+			downM:function(){
+				alert("down:"+this.msg);
+			},
+			leftM:function(){
+				alert("left:"+this.msg);
+			},
+			rightM:function(){
+				alert("right:"+this.msg);
+			},
+			//系统修饰键
+			ctrlM:function(){
+				alert("ctrl:"+this.msg);
+			},
+			altM:function(){
+				alert("alt:"+this.msg);
+			},
+			shiftM:function(){
+				alert("shift:"+this.msg);
+			},
+			metaM:function(){
+				alert("meta:"+this.msg);
+			},
+			//exact修饰符
+			onCtrlClick:function(){
+				alert("onCtrlClick："+this.msg);
+			},
+			onClick:function(){
+				alert("没有任何系统修饰符被按下的时候才触发:"+this.msg);
+			}
+		}
+	});
+</script>
+</html>

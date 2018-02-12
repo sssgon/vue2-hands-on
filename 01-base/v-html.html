@@ -1,0 +1,23 @@
+<html>
+<!--
+	1、双大括号会将数据解释为普通文本，而非 HTML 代码。为了输出真正的 HTML，需要使用 v-html 指令
+-->
+<head>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+	<div id="app">
+		<!-- 使用v-html指令显示 -->
+		<span v-html="rawMsg"></span>
+		<span>使用Mustache语法显示：{{rawMsg}}</span>
+	</div>
+</body>
+<script>
+	var app = new Vue({
+			el:"#app",
+			data:{
+				rawMsg:"<h1>Html语句h1</h1>"
+			}
+	});
+</script>
+</html>

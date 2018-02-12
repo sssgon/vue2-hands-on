@@ -1,0 +1,146 @@
+<html>
+<!--
+	1、表单输入绑定v-model指令可以实现表单输入和应用状态之间的双向绑定；
+	2、你可以用 v-model 指令在表单 <input> 和其它标签元素上创建双向数据绑定。它会根据控件类型自动选取正确的方法来更新元素。尽管有些神奇，但 v-model 本质上不过是语法糖。它负责监听用户的输入事件以更新数据，并对一些极端场景进行一些特殊处理。
+	3、 语法糖(syntactic sugar)是指编程语言中可以更容易的表达一个操作的语法，它可以使程序员更加容易去使用这门语言：操作可以变得更加清晰、方便，或者更加符合程序员的编程习惯。
+	4、注意：v-model 会忽略所有表单元素的 value、checked、selected 特性的初始值而总是将 Vue 实例的数据作为数据来源。可以通过 JavaScript 在Vue组件实例的 data 选项中声明初始值。
+	5、绑定复选框：
+		单个复选框，绑定到布尔值，该值也可以通过true-value和false-value属性改变；多个复选框，绑定到同一个数组：
+	6、修饰符
+		.lazy：将同步更新转变为使用 change 事件进行同步
+		.number：自动将用户的输入值转为数值类型，如果不加的话，会默认为string类型
+
+-->
+<head>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+	<!-- 普通使用 -->
+	<div id="app">
+		<table>
+			<!-- 1、文本 -->
+			<input type="text" v-model="message" value="初始值属性不生效" />
+			<br>
+			<h2>{{message}}
+		</table>
+		<table>
+			<!-- 2、单个复选框 -->
+			<input type="checkbox" id="checkbox" value="singleCheck" v-model="isChecked">单个复选框</input>
+			<br>
+			<label for="checkbox">值为：{{isChecked}}</label>
+			<br>
+			<!-- 2、单个复选框-选中值替换 -->
+			<input type="checkbox" id="checkboxChg" value="singleCheck" 
+			v-model="isCheckedChg" true-value="Y" false-value="N">单个复选框-选中值替换</input>
+			<br>
+			<label for="checkboxChg">值为：{{isCheckedChg}}</label>
+			<br>
+			<!-- 2、多个复选框 -->
+			<input type="checkbox" id="checkNames" value="s1val" v-model="checkNames" >s1</input>
+			<input type="checkbox" id="checkNames" value="s2val" v-model="checkNames" />s2</input>
+			<input type="checkbox" id="checkNames" value="s3val" v-model="checkNames" />s3</input>
+			<p>值为：{{checkNames}}</p>
+		</table>
+		<table>
+			<!--3、单选按钮 -->
+			<input type="radio" id="one" value="one" v-model="onePicked">
+			<label for="one">一</label>
+			<br>
+			<input type="radio" id="two" value="two" v-model="onePicked">
+			<label for="two">二</label>
+			<br>
+			<span>选中的值：{{onePicked}}</span>
+		</table>
+		<table>
+			<!-- 4、单选选择框 -->
+			<br>
+			<select v-model="isSelected" >
+				<option disabled value="">请选择</option>
+				<option value="A1">A</option>
+				<option value="B1">B</option>
+				<option value="C1">C</option>
+				<option value="D1">D</option>
+			</select>
+			<p>选择的是：{{isSelected}}</p>
+			<!-- 4、多选选择框 -->
+			<br>
+			<select v-model="mulSelected" multiple >
+				<option disabled value="">请选择</option>
+				<option value="A1">A</option>
+				<option value="B1">B</option>
+				<option value="C1">C</option>
+				<option value="D1">D</option>
+			</select>
+			<p>选择的是：{{mulSelected}}</p>
+		</table>
+	</div>
+	<!-- 用 v-for 渲染select标签的动态选项
+		1、此处的v-bind:value用于给<option>标签value属性赋值
+	 -->
+	<div id="dymSelectApp">用 v-for 渲染select标签的动态选项
+		<select v-model="selected">
+			<option v-for="option in options" v-bind:value="option.value">
+				{{option.text}}
+			</option>
+		</select>
+		<span>选中的是：{{selected}}</span>
+	</div>
+	<!-- 修饰符 -->
+	<div id="adorn">
+		<!-- .lazy修饰符 -->
+		<label>.lazy修饰符:</label>
+		<input type="text" v-model.lazy="lazyInput" />
+		<p>{{lazyInput}}</p>
+		<br>
+		<!-- .number修饰符 -->
+		<label>.number修饰符:</label>
+		<input type="text" v-model.number="numberInput" v-on:click="getValueType" />
+		<p>{{numberInput}}</p>
+	</div>
+
+
+</body>
+<script>
+	/*普通使用*/
+	var app = new Vue({
+		el:"#app",
+		data:{
+			message:'要在这里赋初始值',//1、文本框：
+			isChecked:'',//2、复选框：如果是字符串，那么选中返回true，未选中返回false
+			isCheckedChg:'',//2、复选框：使用true-value和false-value属性改变选中的值
+			checkNames:[],//2、复选框：如果是数组，那么会将选中的value值，放在该数组中
+			onePicked:'',//3、单选按钮：得到选中的value值
+			isSelected:'',//4、单选选择框：得到选中的value值
+			mulSelected:[]//4、多选选择框：得到选中的value值，放在数组中
+		}
+	});
+	/*用 v-for 渲染select标签的动态选项*/
+	var dymSelectApp = new Vue({
+		el:"#dymSelectApp",
+		data:{
+			selected:'dyB1',//单选选择框默认值
+			//selected:['dyB1','dyC1'],//有multiple属性的复选选择框默认值，需要使用数组
+			options:[
+				{text:'dyA',value:'dyA1'},
+				{text:'dyB',value:'dyB1'},
+				{text:'dyC',value:'dyC1'},
+				{text:'dyD',value:'dyD1'},
+				{text:'dyInner',value:{num:'dyD1',pic:'pic1'}}//这种也可以，value中放多种数据
+			]
+		}
+	});
+	/*修饰符*/
+	var adorn = new Vue({
+		el:"#adorn",
+		data:{
+			lazyInput:'',
+			numberInput:''
+		},
+		methods:{
+			getValueType:function(){
+				console.log(typeof this.numberInput);
+			}
+		}
+	});
+</script>
+</html>

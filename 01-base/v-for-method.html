@@ -1,0 +1,201 @@
+<html>
+<!--
+	v-for指令变异和非变异方法
+	1、变异方法：会改变调用这些方法的原始数组。
+	  非变异方法：调用这些方法不会改变原始数组，总是返回一个新数组。
+	2、变异方法：
+		push()： 往数组最后面添加一个元素，成功返回当前数组的长度
+		pop()： 删除数组的最后一个元素，成功返回删除元素的值
+		shift()：删除数组的第一个元素，成功返回删除元素的值
+		unshift()：往数组最前面添加一个元素，成功返回当前数组的长度
+		splice()：有三个参数，第一个是想要删除的元素的下标（必选），第二个是想要删除的个数（必选），第三个是删除后想要在原位置替换的值（可选）
+		sort()：调用每个数组项的toString()方法，然后比较得到的字符串排序，使数组按照字符编码默认从小到大排序,成功返回排序后的数组
+		reverse()：将数组倒序，成功返回倒序后的数组
+	3、非变异方法：
+		concat()：先创建当前数组一个副本，然后将接收到的参数添加到这个副本的末尾，最后返回新构建的数组
+		slice()：基于当前数组中一个或多个项创建一个新数组，接受一个或两个参数，即要返回项的起始和结束位置，最后返回新数组
+		map()：对数组的每一项运行给定函数，返回每次函数调用的结果组成的数组
+		filter()：对数组中的每一项运行给定函数，该函数会返回true的项组成的数组
+	4、注意：
+		（一）、Vue无法侦测的数组变化
+		如果通过下标的方式直接对数组复制或修改数组长度，Vue无法侦测到数组的变化：
+		a、当利用索引直接设置一个项时，例如：vm.items[indexOfItem] = newValue
+		b、当修改数组的长度时，例如：vm.items.length = newLength
+		替代方式：
+		为了解决a问题，以下两种方式都可以实现和 vm.items[indexOfItem] = newValue 相同的效果，同时也将触发状态更新：
+		// Vue.set
+		Vue.set(nonmutation.items, indexOfItem, newValue)
+		// Array.prototype.splice
+		nonmutation.items.splice(indexOfItem, 1, newValue)
+		为了解决b问题，可以使用 splice：
+		nonmutation.items.splice(newLength)
+		（二）、Vue无法侦测对象属性的增加或删除
+		对于已经创建的实例，Vue 不能动态添加根级别的响应式属性。但是，可以使用 Vue.set(object, key, value) 方法向嵌套对象添加响应式属性。
+
+-->
+<head>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+	<!-- 1、变异方法 -->
+	<div id="mutation">
+		1、变异方法
+		<ul v-for="(people,index) in team">
+			<li>
+				{{people.name}}的赏金{{people.price}}，排名{{index+1}}
+			</li>
+		</ul>
+		<!-- 1.1、push -->
+		<span>1.1、push增加船员</span>
+		<input type="text" v-model="m_text" placeholder="增加船员"  /><button v-on:click="pushBtn()">push</button>
+		<br>
+		<!-- 1.2、pop -->
+		<span>1.2、pop移除最后一个船员</span>
+		<button v-on:click="popBtn()">pop</button>
+		<br>
+		<!-- 1.3、shift -->
+		<span>1.3、shift移除第一个船员</span>
+		<button v-on:click="shiftBtn()">shift</button>
+		<br>
+		<!-- 1.4、unshift -->
+		<span>1.4、unshift增加船员</span>
+		<input type="text" v-model="m_text" placeholder="增加船员"  /><button v-on:click="unshiftBtn()">unshift</button>
+		<br>
+		<!-- 1.5、splice删除下标的元素 -->
+		<span>1.5、splice删除排位的船员</span>
+		<input type="text"  v-model="m_del_index" placeholder="船员排位" /><button v-on:click="spliceBtn()">splice</button>
+		<br>
+		<!-- 1.6、sort -->
+		<span>1.6、sort船员排序</span>
+		<button v-on:click="sortBtn()">sort</button>
+		<br>
+		<!-- 1.7、reverse -->
+		<span>1.7、reverse船员倒序排序</span>
+		<button v-on:click="reverseBtn()">reverse</button>
+		<br>
+		<!-- 1.8、无法侦测变化 -->
+		<span>1.8、直接下标赋值无法侦测变化</span>
+		<button v-on:click="testBtn()">test</button>
+		<br>
+	</div>
+	<!-- 2、非变异方法 -->
+	<div id="nonmutation">
+		<ul>2、非变异方法
+			<li v-for="item in items" >
+			{{ item }}
+			</li>
+		</ul> 
+		<div>
+			<button @click='concat'>concat</button>
+			<button @click='slice'>slice</button>
+			<button @click='map'>map</button>
+			<button @click='filter'>filter</button>
+		</div>
+	</div>
+	<!-- 3、filter过滤器 -->
+	<div id="filter">
+		<ul>3.1、filter过滤器(computed)
+			<li v-for="num in fileterNum">
+				{{num}}
+			</li>
+		</ul>
+		------------------------------
+		<ul>3.2、filter过滤器(method)
+			<li v-for="num in even(numbers)">
+				{{num}}
+			</li>
+		</ul>
+	</div>
+
+</body>
+<script>
+	var mutation = new Vue({
+		el:"#mutation",
+		data:{
+			m_text:'',
+			m_del_index:'',
+			team:[
+					{name:"路飞",price:90000},
+					{name:"白胡子",price:80000},
+					{name:"乔巴",price:6000},
+					{name:"娜美",price:3000}
+				 ]
+
+		},
+		methods:{
+			pushBtn:function(){
+				this.team.push({name:this.m_text,price:Math.random()});
+			},
+			popBtn:function(){
+				this.team.pop();
+			},
+			shiftBtn:function(){
+				this.team.shift();
+			},
+			unshiftBtn:function(){
+				this.team.unshift({name:this.m_text,price:Math.random()+999});
+			},
+			spliceBtn:function(){
+				this.team.splice(this.m_del_index,1);
+			},
+			sortBtn:function(){
+				this.team.sort();
+			},
+			reverseBtn:function(){
+				this.team.reverse();
+			},
+			testBtn:function(){
+				this.team[0] = {name:"无法侦测",price:123};
+			}
+		}
+	});
+
+	var nonmutation = new Vue({
+		 el: '#nonmutation',
+		 data: {
+			 items: ['Foo','Bar','Baz'],
+			 addValue:'新船员'
+		 },
+		 methods:{
+			 concat(){
+			  this.items = this.items.concat(this.addValue)
+			 },
+			 slice(){
+			  this.items = this.items.slice(1)
+			 },
+			 map(){
+			  this.items = this.items.map(function(item,index,arr){
+			  return index + item; 
+			  })
+			 },
+			 filter(){
+			  this.items = this.items.filter(function(item,index,arr){
+			  return (index > 0); 
+			  })
+			 }
+		 }
+	});
+
+	var filter = new Vue({
+		el:"#filter",
+		data:{
+			numbers:[1,2,3,4,5,6,7,8]
+		},
+		computed:{
+			fileterNum:function(){
+				return this.numbers.filter(function(number){
+					return number %2 == 0;
+				});
+			}
+		},
+		methods:{
+			even:function(numbers){
+				return numbers.filter(function(number){
+					return number %2 != 0;
+				});
+			}
+		}
+
+	});
+</script>
+</html>

@@ -1,0 +1,62 @@
+<html>
+<!--
+	1、computed：计算属性将被混入到 Vue 实例中。所有 getter 和 setter 的 this 上下文自动地绑定为 Vue 实例。
+	2、methods：methods 将被混入到 Vue 实例中。可以直接通过 VM 实例访问这些方法，或者在指令表达式中使用。方法中的 this 自动绑定为 Vue 实例。
+	3、watch：是一种更通用的方式来观察和响应 Vue 实例上的数据变动。一个对象，键是需要观察的表达式，值是对应回调函数。值也可以是方法名，或者包含选项的对象。Vue 实例将会在实例化时调用 $watch()，遍历 watch 对象的每一个属性。
+	通俗来讲，
+	1、computed是在HTML DOM加载后马上执行的，如赋值；
+	2、methods则必须要有一定的触发条件才能执行，如点击事件；
+	3、watch用于观察Vue实例上的数据变动。对应一个对象，键是观察表达式，值是对应回调。值也可以是方法名，或者是对象，包含选项。
+	所以他们的执行顺序为：默认加载的时候先computed再watch，不执行methods；等触发某一事件后，则是：先methods再watch。
+-->
+<head>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+	<div id="app">
+		<input type="text" v-model="message" />
+		<br>
+		{{message}}
+		<!-- <p>{{reverseMessage}}</p> 
+		
+		<p>{{methodMessage()}}</p> -->
+		
+		<button v-on:click="reverseMessage">computed</button>
+		<br>
+		<button v-on:click="methodMessage()">methods</button>
+	
+	</div>
+
+
+</body>
+<script>
+	var app = new Vue({
+		el:"#app",
+	    data:{
+	        message:"hello",
+	        watchMsg:''
+	    },
+	    computed:{
+	     		reverseMessage:function(){
+	     			this.message = this.message.split('').reverse().join('');
+	            	return this.message;
+	         }
+	    },
+
+	    methods:{
+			    methodMessage:function () {
+			        this.message = this.message.split('').reverse().join('');
+			        return this.message;
+			    }
+	    }/*,
+	    watch:{
+	     		watchMsg:function(){//message属性改变时触发该方法
+	    			this.message = this.message.split('').reverse().join('');
+	    			console.log(this.message);
+	    	}
+	    }*/
+	
+	});
+
+</script>
+</html>

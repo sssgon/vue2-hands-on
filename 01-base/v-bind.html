@@ -1,0 +1,84 @@
+<html>
+<!--
+	1、v-bind指令，它可以往元素的属性中绑定数据，也可以动态地根据数据为元素绑定不同的样式
+	2、例：v-bind:title="message"可简写为:title="message"
+	3、也可以绑定CSS样式,v-bind:class="{'is-actice':isActive}"
+	4、v-bind:可缩写为:即
+			v-bind:class="{'is-active':isActive}" 等效 :class="{'is-active':isActive}"
+-->
+<head>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<!--测试绑定css样式 -->
+<style>
+    .is-active {
+        color: white;
+        background-color: green;
+    }
+    .is-err {
+        color: white;
+        background-color: red;
+    }
+</style>
+
+</head>
+<body>
+	<div id="app">
+		<!-- 1、为span标签的title属性绑定值 -->
+		<span v-bind:title="message">
+			鼠标停留有惊喜
+		</span>
+		<br>
+		<!-- 2、为a标签的href属性绑定值 -->
+		<a v-bind:href="url">URL</a>
+		<br>
+		<!-- 3、为button标签的style属性绑定值 -->
+		<button v-bind:style="styles">绑定style样式</button>
+		<br>
+		<!-- 4、根据数据中isActive来决定是否把is-active这个class加给元素 -->
+		<button v-bind:class="{'is-active':isActive}" >绑定css样式</button>
+		<button :class="{'is-active':isActive}" >绑定css样式（v-bind缩写）</button>
+		<br>
+		<!-- 5、为div标签的id属性绑定值 -->
+		<div v-bind:id="dynamicId"></div>
+		<br>
+		<!-- 6、样式切换启用 -->
+		<button v-bind:class="{'is-active':isBtnActive,'is-err':isBtnErr}"
+			v-on:click="chgBtn"
+		>按钮样式变换</button>
+
+	</div>
+</body>
+<script>
+	var app = new Vue({
+		el:"#app",
+		data:{
+			message:"页面加载时间："+new Date().toLocaleString(),//1、为span标签的title属性绑定值
+			url:"http://www.baidu.com",//2、为a标签的href属性绑定值
+			styles:{//3、为button标签的style属性绑定值
+				color: 'white',
+		        backgroundColor: 'blue'
+		    },
+			isActive: true,//4、根据数据中isActive来决定是否把is-active这个class加给元素
+			dynamicId: "newID",//5、为div标签的id属性绑定值
+			isBtnActive:true,//6、样式切换启用
+			isBtnErr:false//6、样式切换启用
+		},
+		methods:{
+			chgBtn:function(){//6、样式切换启用
+				if(this.isBtnActive == true){
+					this.isBtnActive = false;
+				}else{
+					this.isBtnActive = true;
+				}
+
+				if(this.isBtnErr == true){
+					this.isBtnErr = false;
+				}else{
+					this.isBtnErr = true;
+				}
+
+			}
+		}
+	});
+</script>
+</html>

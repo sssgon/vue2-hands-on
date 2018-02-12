@@ -1,0 +1,30 @@
+<html>
+<!--
+	1、侦听器watch可以用来监听数据的变化，当数据变化时，可以执行对应的方法
+-->
+<head>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+	<div id="app">
+		<input type="text" v-model="message" />
+		<p>{{watchMsg}}</p>
+		
+	</div>
+
+</body>
+<script>
+	var app = new Vue({
+		el:'#app',
+		data:{
+			message:'',
+			watchMsg:''
+		},
+		watch:{
+			message:function(newValue,oldValue){
+				this.watchMsg = "原始值："+oldValue+"==新值："+newValue;
+			}
+		}
+	});
+</script>
+</html>

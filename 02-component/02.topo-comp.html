@@ -1,0 +1,50 @@
+<html>
+<!--
+	局部组件：
+	1、局部组件的有效范围只在其作用域中有效；
+	2、组件和组件之间，即使有同名属性，值也不共享
+
+-->
+<head>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+	<div id="app">
+		<my-component></my-component>
+		<add></add>
+		<del></del>
+	</div>
+
+	<div id="app2">
+		<my-component></my-component>
+	</div>	
+
+</body>
+<script>
+	var child = {
+		template:'<span>局部组件</span>'
+	};
+	//局部组件的有效范围只在其作用域中有效
+	var app = new Vue({
+		el:'#app',
+		components:{
+			'my-component':child,
+			"add": { 
+				template: "<button>btn：{{btn}}</button>", 
+				data: function () { 
+					return {btn: "123"}; 
+				} 
+			}, 
+			'del': {
+				template: "<button>btn：{{btn}}</button>", 
+				data: function () { 
+					return {btn: "456"}; 
+				} 
+			} 
+		}
+	});
+	var app2 = new Vue({
+		el:'#app2'
+	});
+</script>
+</html>
