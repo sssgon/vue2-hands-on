@@ -3,20 +3,50 @@
 	局部组件：
 	1、局部组件的有效范围只在其作用域中有效；
 	2、组件和组件之间，即使有同名属性，值也不共享
+	3、数据绑定类型：
+	Prop 是单向绑定的：当父组件的属性变化时，将传导给子组件，但是反过来不会。这是为了防止子组件无意间修改了父组件的状态，来避免应用的数据流变得难以理解。
+	另外，每次父组件更新时，子组件的所有 prop 都会更新为最新值。这意味着你不应该在子组件内部改变 prop。如果你这么做了，Vue 会在控制台给出警告。
+	在两种情况下，我们很容易忍不住想去修改 prop 中数据：
+	(1)Prop 作为初始值传入后，子组件想把它当作局部数据来用；
+	应对方式：定义一个局部变量，并用 prop 的值初始化它。
+	(2)Prop 作为原始数据传入，由子组件处理成其它数据输出。
+	应对方式：定义一个计算属性，处理 prop 的值并返回。
+	在Vue2中取消了.sync双向数据绑定，在Vue1中可以使用，在 Vue2.3.0重新引入了 .sync 修饰符，但是这次它只是作为一个编译时的语法糖存在。它会被扩展为一个自动更新父组件属性的 v-on 监听器。
+
+
 
 -->
 <head>
-<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
 </head>
 <body>
 	<div id="app">
 		<my-component></my-component>
-		<add></add>
-		<del></del>
+		<br>
+		<span>1、定义一个局部变量，并用 prop 的值初始化它：</span>
+		<add-component></add-component>
+		<del-component></del-component>
 	</div>
-
+	
 	<div id="app2">
 		<my-component></my-component>
+		<br>
+		<span>2、定义一个计算属性，处理 prop 的值并返回</span>
+		<add-component val="h"></add-component>
+		<br>
+		<span>3、数据绑定类型</span>
+		<!-- 数据绑定类型 -->
+		<input type="text" v-model="h" /><!-- 父组件 -->
+		<!-- 单向绑定 -->
+		<br>
+		<span>3.1、单向绑定</span>
+		<add-component v-bind:val="h"></add-component><!-- 子组件 -->
+		<!-- 双向绑定 -->
+		<br>
+		<span>3.2、双向绑定（有问题，待测试）</span>
+		<add-component v-bind:val.sync="h"></add-component><!-- 子组件 -->
+
 	</div>	
 
 </body>
@@ -29,22 +59,35 @@
 		el:'#app',
 		components:{
 			'my-component':child,
-			"add": { 
+			//1、定义一个局部变量，并用 prop 的值初始化它：
+			"add-component": { 
 				template: "<button>btn：{{btn}}</button>", 
 				data: function () { 
 					return {btn: "123"}; 
 				} 
 			}, 
-			'del': {
+			'del-component': {
 				template: "<button>btn：{{btn}}</button>", 
 				data: function () { 
 					return {btn: "456"}; 
-				} 
+				}  
 			} 
 		}
 	});
 	var app2 = new Vue({
-		el:'#app2'
+		el:'#app2',
+		data:{
+			h:"hello"
+		},
+		components:{
+			"add-component":{
+				props:['val'],
+				template:"<input v-model='val' />",
+				data:function(){
+					return {val:"123"};
+				}
+			}
+		}
 	});
 </script>
 </html>
